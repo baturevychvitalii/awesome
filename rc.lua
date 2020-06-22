@@ -105,7 +105,7 @@ volume.bar:buttons(awful.util.table.join(
 
 local battery = lain.widget.bat{
 	settings = function()
-		widget:set_markup("║"..bat_now.perc.."╠ ")
+		widget:set_markup("⚡"..bat_now.perc.."⚡ ")
 	end
 } 
 
