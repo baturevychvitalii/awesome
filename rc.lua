@@ -69,18 +69,20 @@ awful.layout.layouts = {
 }
 -- }}}
 
+-- Themes define colours, icons, font and wallpapers.
+beautiful.init("~/.config/awesome/theme.lua")
+
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
-
--- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
 
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
 
-local volume = lain.widget.pulsebar{}
+local volume = lain.widget.pulsebar{
+	colors = {background = beautiful.bg_normal, mute = "#EB8F8F", unmute = "#A4CE8A" }
+}
 
 volume.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
@@ -107,8 +109,6 @@ local battery = lain.widget.bat{
 	end
 } 
 
--- Themes define colours, icons, font and wallpapers.
-beautiful.init("~/.config/awesome/theme.lua")
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -362,7 +362,7 @@ globalkeys = gears.table.join(
               myscreen.mywibox.visible = not myscreen.mywibox.visible
           end,
           {description = "toggle statusbar", group = "awesome"}
-		  )
+	)
 )
 
 clientkeys = gears.table.join(
@@ -407,7 +407,9 @@ clientkeys = gears.table.join(
             c:raise()
         end ,
         {description = "(un)maximize horizontally", group = "client"}),
-	awful.key({ modkey, "Control" }, "t", function(c) awful.titlebar.toggle(c) end)
+	awful.key({ modkey, "Control" }, "t", function(c) awful.titlebar.toggle(c) end,
+		{description = "toggle titlebar", group = "client"}
+	)
 )
 
 -- Bind all key numbers to tags.
@@ -479,6 +481,7 @@ root.keys(globalkeys)
 -- }}}
 
 local telegram_close_counter = 0
+
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
@@ -627,20 +630,13 @@ client.connect_signal("mouse::enter", function(c)
     c:emit_signal("request::activate", "mouse_enter", {raise = false})
 end)
 
--- toggle titlebar on focus/unfocus of Picture-in-Picture mode for Firefox
---client.connect_signal("focus", function(c)
---	c.border_color = beautiful.border_focus 
---	if c.name == "Picture-in-Picture" then
---		awful.titlebar.show(c)
---	end
---end)
---
---client.connect_signal("unfocus", function(c)
---	c.border_color = beautiful.border_normal
---	if c.name == "Picture-in-Picture" then
---		awful.titlebar.hide(c)
---	end
---end)
+client.connect_signal("focus", function(c)
+	c.border_color = beautiful.border_focus 
+end)
+
+client.connect_signal("unfocus", function(c)
+	c.border_color = beautiful.border_normal
+end)
 
 client.connect_signal("property::minimized", function(c) if
 	c.class == "dota2" or
