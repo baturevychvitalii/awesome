@@ -80,10 +80,87 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
 
--- volume widget
-local volume = lain.widget.pulsebar{
-	colors = {background = beautiful.bg_normal, mute = beautiful.volume_bar_mute, unmute = beautiful.volume_bar_unmute }
+-- battery widget
+local battery_status
+local battery = lain.widget.bat{
+	settings = function()
+		battery_status = bat_now
+		widget:set_markup("⚡"..bat_now.perc.."⚡ ")
+	end
+} 
+
+local battery_tooltip = awful.tooltip
+{
+	objects = {battery.widget},
+	timer_function = function()
+		return string.format("Status: %s\nTime left: %s", battery_status.status, battery_status.time)
+	end
 }
+
+local bar_width = 50
+-- brightness widget
+local brightness = {}
+brightness.bar = wibox.widget {
+	max_value     = 100,
+	value         = 0,
+	forced_height = 20,
+	forced_width  = bar_width,
+	border_width  = 1,
+	margins = 1,
+	color = beautiful.brightness_bar,
+	background_color = beautiful.bg_normal,
+	border_color  = beautiful.border_color,
+	widget        = wibox.widget.progressbar,
+}
+brightness.update = function()
+	awful.spawn.easy_async_with_shell("Vbrightness %", function(stdout)
+		brightness.bar:set_value(tonumber(stdout))
+	end)
+end
+brightness.bar:buttons(awful.util.table.join(
+    awful.button({}, 2, function() -- middle click
+		os.execute("Vbrightness 0")
+        brightness.update()
+    end),
+    awful.button({}, 4, function() -- scroll up
+		os.execute("Vbrightness +")
+        brightness.update()
+    end),
+    awful.button({}, 5, function() -- scroll down
+		os.execute("Vbrightness -")
+        brightness.update()
+    end)
+))
+
+-- volume widget
+local volume = {}
+volume.bar = wibox.widget {
+	max_value	  = 100,
+	value         = 0,
+	forced_height = 20,
+	forced_width  = bar_width,
+	border_width  = 1,
+	margins = 1,
+	background_color = beautiful.bg_normal,
+	border_color  = beautiful.border_color,
+	widget        = wibox.widget.progressbar,
+}
+
+volume.update = function()
+	awful.spawn.easy_async_with_shell("Vvolume %", function(stdout)
+		local curr_volume = string.match(stdout, "Volume: (%d+)")
+		local muted = string.match(stdout, "Mute: (%S+)")
+		
+		-- set foreground color
+		if muted == "no" then
+			volume.bar.color = beautiful.volume_bar_unmute
+		else
+			volume.bar.color = beautiful.volume_bar_mute
+		end
+		
+		volume.bar:set_value(tonumber(curr_volume))
+	end)
+end
 
 volume.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
@@ -104,59 +181,8 @@ volume.bar:buttons(awful.util.table.join(
     end)
 ))
 
--- battery widget
-local battery_status
-local battery = lain.widget.bat{
-	settings = function()
-		battery_status = bat_now
-		widget:set_markup("⚡"..bat_now.perc.."⚡ ")
-	end
-} 
-
-local battery_tooltip = awful.tooltip
-{
-	objects = {battery.widget},
-	timer_function = function()
-		return string.format("Status: %s\nTime left: %s", battery_status.status, battery_status.time)
-	end
-}
-
--- brightness widget
-local brightness = {}
-brightness.bar = wibox.widget {
-	max_value     = 100,
-	value         = 0,
-	forced_height = 20,
-	forced_width  = 63,
-	border_width  = 1,
-	margins = 1,
-	color = beautiful.brightness_bar,
-	background_color = beautiful.bg_normal,
-	border_color  = beautiful.border_color,
-	widget        = wibox.widget.progressbar,
-}
-brightness.update = function()
-	local val
-	awful.spawn.easy_async_with_shell("Vbrightness %", function(stdout, err, reason, code)
-		brightness.bar:set_value(tonumber(stdout))
-	end)
-end
-brightness.bar:buttons(awful.util.table.join(
-    awful.button({}, 3, function() -- right click
-		os.execute("Vbrightness 0")
-        brightness.update()
-    end),
-    awful.button({}, 4, function() -- scroll up
-		os.execute("Vbrightness +")
-        brightness.update()
-    end),
-    awful.button({}, 5, function() -- scroll down
-		os.execute("Vbrightness -")
-        brightness.update()
-    end)
-))
-
 brightness.update()
+volume.update()
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(

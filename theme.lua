@@ -33,6 +33,7 @@ theme.border_marked = "#91231c"
 theme.volume_bar_unmute = "#a4ce8a"
 theme.volume_bar_mute = "#eb8f8f"
 theme.brightness_bar = "#fbee88"
+theme.battery_bar = "#fcff1a"
 
 -- There are other variable sets
 -- overriding the default one when
