@@ -15,7 +15,6 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
 
-local lain = require("lain")
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 --require("awful.hotkeys_popup.keys")
@@ -81,19 +80,48 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 mytextclock = wibox.widget.textclock()
 
 -- battery widget
-local battery_status
-local battery = lain.widget.bat{
-	settings = function()
-		battery_status = bat_now
-		widget:set_markup("⚡"..bat_now.perc.."⚡ ")
-	end
-} 
+local battery_status = {status = "N/A", percentage = 0}
+
+local battery = wibox.widget {
+	{
+		max_value     = 100,
+		value         = 0,
+		widget        = wibox.widget.progressbar,
+		border_width  = 1,
+		margins = 1,
+		color = beautiful.battery_bar_charged,
+		background_color = beautiful.battery_bar_discharged,
+		id = "bar",
+		border_color  = beautiful.border_color
+	},
+	direction = 'east',
+	forced_height = 100,
+	forced_width = 17,
+	layout        = wibox.container.rotate
+}
 
 local battery_tooltip = awful.tooltip
 {
-	objects = {battery.widget},
+	objects = {battery},
 	timer_function = function()
-		return string.format("Status: %s\nTime left: %s", battery_status.status, battery_status.time)
+		return string.format("Status: %s\n%d%%", battery_status.status, battery_status.percentage)
+	end
+}
+
+gears.timer {
+	timeout = 45,
+	call_now = true,
+	autostart = true,
+	callback = function()
+		-- get percentage
+		local file = io.open("/sys/class/power_supply/BAT0/capacity")
+		battery_status.percentage = tonumber(file:read())
+		file:close()
+		-- get status
+		file = io.open("/sys/class/power_supply/BAT0/status")
+		battery_status.status = file:read()
+		file:close()
+		battery.bar:set_value(battery_status.percentage)
 	end
 }
 
@@ -112,11 +140,13 @@ brightness.bar = wibox.widget {
 	border_color  = beautiful.border_color,
 	widget        = wibox.widget.progressbar,
 }
+
 brightness.update = function()
 	awful.spawn.easy_async_with_shell("Vbrightness %", function(stdout)
 		brightness.bar:set_value(tonumber(stdout))
 	end)
 end
+
 brightness.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
 		os.execute("Vbrightness 0")
@@ -284,16 +314,19 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
             s.mytaglist,
+			wibox.widget.textbox("|"),
 			volume.bar,
+			wibox.widget.textbox("|"),
 			brightness.bar,
+			wibox.widget.textbox("|"),
             s.mypromptbox,
         },
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-			battery.widget,
             wibox.widget.systray(),
             mytextclock,
+			battery,
             s.mylayoutbox,
         },
     }
