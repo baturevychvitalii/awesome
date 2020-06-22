@@ -30,6 +30,10 @@ theme.border_normal = theme.bg_normal
 theme.border_focus  = "#e53c18"
 theme.border_marked = "#91231c"
 
+theme.volume_bar_unmute = "#a4ce8a"
+theme.volume_bar_mute = "#eb8f8f"
+theme.brightness_bar = "#fbee88"
+
 -- There are other variable sets
 -- overriding the default one when
 -- defined, the sets are:
