@@ -132,7 +132,7 @@ gears.timer {
 				fg = beautiful.fg_urgent
 			})
 			low_battery_showed = true
-		elseif low_battery_showed and battery_status.status == "Charging" and battery_status.percentage > 10 then
+		elseif low_battery_showed and battery_status.status == "Charging" then
 			low_battery_showed = false
 		end
 	end
@@ -171,15 +171,15 @@ end
 
 brightness.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
-		os.execute("Vbrightness 0")
+		awful.spawn.easy_async_with_shell("Vbrightness 0",function()end)
         brightness.update()
     end),
     awful.button({}, 5, function() -- scroll up
-		os.execute("Vbrightness +")
+		awful.spawn.easy_async_with_shell("Vbrightness +",function()end)
         brightness.update()
     end),
     awful.button({}, 4, function() -- scroll down
-		os.execute("Vbrightness -")
+		awful.spawn.easy_async_with_shell("Vbrightness -",function()end)
         brightness.update()
     end)
 ))
@@ -226,20 +226,20 @@ end
 
 volume.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
-		os.execute("Vvolume 50")
+		awful.spawn.easy_async_with_shell("Vvolume 50",function()end)
         volume.update()
     end),
     awful.button({}, 3, function() -- right click
-		os.execute("Vvolume 0")
+		awful.spawn.easy_async_with_shell("Vvolume 0",function()end)
         volume.update()
     end),
     awful.button({}, 5, function() -- scroll up
-		os.execute("Vvolume +")
-        volume.update()
+		awful.spawn.easy_async_with_shell("Vvolume +",function()end)
+		volume.update()
     end),
     awful.button({}, 4, function() -- scroll down
-		os.execute("Vvolume -")
-        volume.update()
+		awful.spawn.easy_async_with_shell("Vvolume -",function()end)
+		volume.update()
     end)
 ))
 
@@ -458,30 +458,30 @@ globalkeys = gears.table.join(
               {description = "run prompt", group = "launcher"}
 	),
 	awful.key({}, "XF86MonBrightnessDown", function()
-		os.execute("Vbrightness -")
+		awful.spawn.easy_async_with_shell("Vbrightness -",function()end)
 		brightness.update()
 		end,
 		{description = "lower brightness", group = "system"}
 	),
 	awful.key({}, "XF86MonBrightnessUp", function()
-		os.execute("Vbrightness +")
+		awful.spawn.easy_async_with_shell("Vbrightness +",function()end)
 		brightness.update()
 		end,
 		{description = "raise brightness", group = "system"}
 	),
 	awful.key({}, "XF86AudioMute", function()
-			os.execute("Vvolume 0")
+			awful.spawn.easy_async_with_shell("Vvolume 0",function()end)
 			volume.update()
 		end,
 		{description = "mute", group = "system"}
 	),
 	awful.key({}, "XF86AudioLowerVolume", function()
-			os.execute("Vvolume -")
+			awful.spawn.easy_async_with_shell("Vvolume -",function()end)
 			volume.update() end,
 		{description = "lower volume", group = "system"}
 	),
 	awful.key({}, "XF86AudioRaiseVolume", function()
-			os.execute("Vvolume +")
+			awful.spawn.easy_async_with_shell("Vvolume +",function()end)
 			volume.update()
 			end,
 		{description = "raise volume", group = "system"}
