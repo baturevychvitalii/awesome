@@ -100,6 +100,15 @@ local battery = wibox.widget {
 	layout        = wibox.container.rotate
 }
 
+local random_miracle = function()
+	battery.bar.color = beautiful.battery_bar_miracle[math.random(0,#beautiful.battery_bar_miracle)]
+end
+
+battery.bar:buttons(awful.util.table.join(
+    awful.button({}, 5, random_miracle ),
+    awful.button({}, 4, random_miracle )
+))
+
 local battery_tooltip = awful.tooltip
 {
 	objects = {battery},
@@ -131,8 +140,10 @@ gears.timer {
 				bg = beautiful.bg_urgent,
 				fg = beautiful.fg_urgent
 			})
+			battery.bar.color = beautiful.battery_bar_low
 			low_battery_showed = true
 		elseif low_battery_showed and battery_status.status == "Charging" then
+			battery.bar.color = beautiful.battery_bar_charged
 			low_battery_showed = false
 		end
 	end
@@ -171,7 +182,7 @@ end
 
 brightness.bar:buttons(awful.util.table.join(
     awful.button({}, 2, function() -- middle click
-		awful.spawn.easy_async_with_shell("Vbrightness 0",function()end)
+		os.execute("Vbrightness 0")
         brightness.update()
     end),
     awful.button({}, 5, function() -- scroll up
@@ -230,7 +241,7 @@ volume.bar:buttons(awful.util.table.join(
         volume.update()
     end),
     awful.button({}, 3, function() -- right click
-		awful.spawn.easy_async_with_shell("Vvolume 0",function()end)
+		os.execute("Vvolume 0")
         volume.update()
     end),
     awful.button({}, 5, function() -- scroll up
@@ -470,7 +481,7 @@ globalkeys = gears.table.join(
 		{description = "raise brightness", group = "system"}
 	),
 	awful.key({}, "XF86AudioMute", function()
-			awful.spawn.easy_async_with_shell("Vvolume 0",function()end)
+			os.execute("Vvolume 0")
 			volume.update()
 		end,
 		{description = "mute", group = "system"}

@@ -35,7 +35,16 @@ theme.volume_bar_unmute = theme.bg_focus
 theme.volume_bar_mute = "#eb8f8f"
 theme.brightness_bar = theme.bg_focus
 theme.battery_bar_charged = theme.fg_focus
+theme.battery_bar_low = "#de2843"
 theme.battery_bar_discharged = theme.bg_normal
+theme.battery_bar_miracle = {
+    theme.battery_bar_charged,
+    "#42e705",
+    "#9c00f7",
+    "#f82a2a",
+    "#ffef00",
+    "#ff9900"
+}
 
 -- There are other variable sets
 -- overriding the default one when
