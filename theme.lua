@@ -30,11 +30,12 @@ theme.border_normal = theme.bg_normal
 theme.border_focus  = "#e53c18"
 theme.border_marked = "#91231c"
 
-theme.volume_bar_unmute = "#a4ce8a"
+--theme.volume_bar_unmute = "#a4ce8a"
+theme.volume_bar_unmute = theme.bg_focus
 theme.volume_bar_mute = "#eb8f8f"
-theme.brightness_bar = "#fbee88"
-theme.battery_bar_charged = theme.volume_bar_unmute
-theme.battery_bar_discharged = theme.volume_bar_mute
+theme.brightness_bar = theme.bg_focus
+theme.battery_bar_charged = theme.fg_focus
+theme.battery_bar_discharged = theme.bg_normal
 
 -- There are other variable sets
 -- overriding the default one when

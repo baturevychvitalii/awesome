@@ -108,6 +108,7 @@ local battery_tooltip = awful.tooltip
 	end
 }
 
+local low_battery_showed = false
 gears.timer {
 	timeout = 45,
 	call_now = true,
@@ -122,28 +123,49 @@ gears.timer {
 		battery_status.status = file:read()
 		file:close()
 		battery.bar:set_value(battery_status.percentage)
+		if battery_status.percentage <= 10 and battery_status.status == "Discharging" and (not low_battery_showed) then
+			naughty.notify({
+				text = "Веталя, заряди меня пожалуйста",
+				title = "Села батарейка",
+				timeout = 0,
+				bg = beautiful.bg_urgent,
+				fg = beautiful.fg_urgent
+			})
+			low_battery_showed = true
+		elseif low_battery_showed and battery_status.status == "Charging" and battery_status.percentage > 10 then
+			low_battery_showed = false
+		end
 	end
 }
 
-local bar_width = 50
+local bar_width = 77 
 -- brightness widget
 local brightness = {}
 brightness.bar = wibox.widget {
-	max_value     = 100,
-	value         = 0,
-	forced_height = 20,
+	{
+		max_value     = 100,
+		value         = 0,
+		border_width  = 1,
+		margins = 1,
+		color = beautiful.brightness_bar,
+		id = "bar",
+		background_color = beautiful.bg_normal,
+		border_color  = beautiful.border_color,
+		widget        = wibox.widget.progressbar,
+	},
+	{
+		text = "☀",
+		font = "sans 17",
+		align = "center",
+		widget = wibox.widget.textbox
+	},
 	forced_width  = bar_width,
-	border_width  = 1,
-	margins = 1,
-	color = beautiful.brightness_bar,
-	background_color = beautiful.bg_normal,
-	border_color  = beautiful.border_color,
-	widget        = wibox.widget.progressbar,
+	layout = wibox.layout.stack
 }
 
 brightness.update = function()
 	awful.spawn.easy_async_with_shell("Vbrightness %", function(stdout)
-		brightness.bar:set_value(tonumber(stdout))
+		brightness.bar.bar:set_value(tonumber(stdout))
 	end)
 end
 
@@ -152,11 +174,11 @@ brightness.bar:buttons(awful.util.table.join(
 		os.execute("Vbrightness 0")
         brightness.update()
     end),
-    awful.button({}, 4, function() -- scroll up
+    awful.button({}, 5, function() -- scroll up
 		os.execute("Vbrightness +")
         brightness.update()
     end),
-    awful.button({}, 5, function() -- scroll down
+    awful.button({}, 4, function() -- scroll down
 		os.execute("Vbrightness -")
         brightness.update()
     end)
@@ -165,15 +187,25 @@ brightness.bar:buttons(awful.util.table.join(
 -- volume widget
 local volume = {}
 volume.bar = wibox.widget {
-	max_value	  = 100,
-	value         = 0,
-	forced_height = 20,
+	{
+		max_value	  = 100,
+		value         = 0,
+		border_width  = 1,
+		margins = 1,
+		id = "bar",
+		background_color = beautiful.bg_normal,
+		border_color  = beautiful.border_color,
+		widget        = wibox.widget.progressbar,
+	},
+	{
+		text = "♫",
+		align = "center",
+		valign = "bottom",
+		font = "sans 11",
+		widget = wibox.widget.textbox
+	},
 	forced_width  = bar_width,
-	border_width  = 1,
-	margins = 1,
-	background_color = beautiful.bg_normal,
-	border_color  = beautiful.border_color,
-	widget        = wibox.widget.progressbar,
+	layout = wibox.layout.stack
 }
 
 volume.update = function()
@@ -183,12 +215,12 @@ volume.update = function()
 		
 		-- set foreground color
 		if muted == "no" then
-			volume.bar.color = beautiful.volume_bar_unmute
+			volume.bar.bar.color = beautiful.volume_bar_unmute
 		else
-			volume.bar.color = beautiful.volume_bar_mute
+			volume.bar.bar.color = beautiful.volume_bar_mute
 		end
 		
-		volume.bar:set_value(tonumber(curr_volume))
+		volume.bar.bar:set_value(tonumber(curr_volume))
 	end)
 end
 
@@ -201,11 +233,11 @@ volume.bar:buttons(awful.util.table.join(
 		os.execute("Vvolume 0")
         volume.update()
     end),
-    awful.button({}, 4, function() -- scroll up
+    awful.button({}, 5, function() -- scroll up
 		os.execute("Vvolume +")
         volume.update()
     end),
-    awful.button({}, 5, function() -- scroll down
+    awful.button({}, 4, function() -- scroll down
 		os.execute("Vvolume -")
         volume.update()
     end)
