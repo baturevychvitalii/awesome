@@ -3,10 +3,14 @@ local gears = require("gears")
 local awful = require("awful")
 local naughty = require("naughty")
 
+local beautiful
 local battery = {}
 
+local battery_status = {status = "N/A", percentage = 0}
+local low_battery_showed = false
+
 battery.init = function(theme)
-	local beautiful = theme
+	beautiful = theme
 
 	battery.widget = wibox.widget {
 		{
@@ -34,10 +38,6 @@ battery.init = function(theme)
 		awful.button({}, 5, random_miracle ),
 		awful.button({}, 4, random_miracle )
 	))
-
-
-	local battery_status = {status = "N/A", percentage = 0}
-	local low_battery_showed = false
 
 	gears.timer {
 		timeout = 45,

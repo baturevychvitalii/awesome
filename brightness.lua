@@ -2,9 +2,10 @@ local wibox = require("wibox")
 local gears = require("gears")
 local awful = require("awful")
 
+local beautiful
 local brightness = {}
 brightness.init = function(theme)
-	local beautiful = theme
+	beautiful = theme
 
 	brightness.widget = wibox.widget {
 		{

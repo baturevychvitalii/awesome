@@ -2,10 +2,11 @@ local wibox = require("wibox")
 local awful = require("awful")
 local gears = require("gears")
 
+local beautiful
 local volume = {}
 
 volume.init = function(theme)
-	local beautiful = theme
+	beautiful = theme
 
 	volume.widget = wibox.widget {
 		{

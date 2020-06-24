@@ -143,6 +143,7 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
+awful.screen.set_auto_dpi_enabled(true)
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
@@ -322,6 +323,10 @@ globalkeys = gears.table.join(
           end,
           {description = "toggle statusbar", group = "awesome"}
 	)
+	--awful.key({ modkey }, "d", function()  end,
+	--		{description = "switch ", group = "screen"}
+	--)
+
 )
 
 globalkeys = gears.table.join(globalkeys, volume.keys, brightness.keys)
@@ -469,6 +474,7 @@ awful.rules.rules = {
 				"Ida",
 				"vlc",
 				"KeePassXC",
+				"Arandr"
 			},
 
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
@@ -497,7 +503,6 @@ awful.rules.rules = {
 	{
 		rule_any = {
 			class = {
-				"Steam",
 				"Wine",
 				"discord"
 			},
@@ -506,7 +511,13 @@ awful.rules.rules = {
 	},
 
 	{
-		rule = {class = "steam_app.*" },
+		rule_any = {
+			class = { 
+				"steam_app.*",
+				"Steam",
+				"battle.net.exe"
+			},
+		},
 		properties = { tag = "3", floating = true }
 	},
 
