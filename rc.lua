@@ -15,6 +15,10 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
 
+local battery = require("./battery")
+local volume = require("./volume")
+local brightness = require("./brightness")
+
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 --require("awful.hotkeys_popup.keys")
@@ -79,183 +83,10 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
 
--- battery widget
-local battery_status = {status = "N/A", percentage = 0}
-
-local battery = wibox.widget {
-	{
-		max_value     = 100,
-		value         = 0,
-		widget        = wibox.widget.progressbar,
-		border_width  = 1,
-		margins = 1,
-		color = beautiful.battery_bar_charged,
-		background_color = beautiful.battery_bar_discharged,
-		id = "bar",
-		border_color  = beautiful.border_color
-	},
-	direction = 'east',
-	forced_height = 100,
-	forced_width = 17,
-	layout        = wibox.container.rotate
-}
-
-local random_miracle = function()
-	battery.bar.color = beautiful.battery_bar_miracle[math.random(0,#beautiful.battery_bar_miracle)]
-end
-
-battery.bar:buttons(awful.util.table.join(
-    awful.button({}, 5, random_miracle ),
-    awful.button({}, 4, random_miracle )
-))
-
-local battery_tooltip = awful.tooltip
-{
-	objects = {battery},
-	timer_function = function()
-		return string.format("Status: %s\n%d%%", battery_status.status, battery_status.percentage)
-	end
-}
-
-local low_battery_showed = false
-gears.timer {
-	timeout = 45,
-	call_now = true,
-	autostart = true,
-	callback = function()
-		-- get percentage
-		local file = io.open("/sys/class/power_supply/BAT0/capacity")
-		battery_status.percentage = tonumber(file:read())
-		file:close()
-		-- get status
-		file = io.open("/sys/class/power_supply/BAT0/status")
-		battery_status.status = file:read()
-		file:close()
-		battery.bar:set_value(battery_status.percentage)
-		if battery_status.percentage <= 10 and battery_status.status == "Discharging" and (not low_battery_showed) then
-			naughty.notify({
-				text = "Веталя, заряди меня пожалуйста",
-				title = "Села батарейка",
-				timeout = 0,
-				bg = beautiful.bg_urgent,
-				fg = beautiful.fg_urgent
-			})
-			battery.bar.color = beautiful.battery_bar_low
-			low_battery_showed = true
-		elseif low_battery_showed and battery_status.status == "Charging" then
-			battery.bar.color = beautiful.battery_bar_charged
-			low_battery_showed = false
-		end
-	end
-}
-
-local bar_width = 77 
--- brightness widget
-local brightness = {}
-brightness.bar = wibox.widget {
-	{
-		max_value     = 100,
-		value         = 0,
-		border_width  = 1,
-		margins = 1,
-		color = beautiful.brightness_bar,
-		id = "bar",
-		background_color = beautiful.bg_normal,
-		border_color  = beautiful.border_color,
-		widget        = wibox.widget.progressbar,
-	},
-	{
-		text = "☀",
-		font = "sans 17",
-		align = "center",
-		widget = wibox.widget.textbox
-	},
-	forced_width  = bar_width,
-	layout = wibox.layout.stack
-}
-
-brightness.update = function()
-	awful.spawn.easy_async_with_shell("Vbrightness %", function(stdout)
-		brightness.bar.bar:set_value(tonumber(stdout))
-	end)
-end
-
-brightness.bar:buttons(awful.util.table.join(
-    awful.button({}, 2, function() -- middle click
-		os.execute("Vbrightness 0")
-        brightness.update()
-    end),
-    awful.button({}, 5, function() -- scroll up
-		awful.spawn.easy_async_with_shell("Vbrightness +",function()end)
-        brightness.update()
-    end),
-    awful.button({}, 4, function() -- scroll down
-		awful.spawn.easy_async_with_shell("Vbrightness -",function()end)
-        brightness.update()
-    end)
-))
-
--- volume widget
-local volume = {}
-volume.bar = wibox.widget {
-	{
-		max_value	  = 100,
-		value         = 0,
-		border_width  = 1,
-		margins = 1,
-		id = "bar",
-		background_color = beautiful.bg_normal,
-		border_color  = beautiful.border_color,
-		widget        = wibox.widget.progressbar,
-	},
-	{
-		text = "♫",
-		align = "center",
-		valign = "bottom",
-		font = "sans 11",
-		widget = wibox.widget.textbox
-	},
-	forced_width  = bar_width,
-	layout = wibox.layout.stack
-}
-
-volume.update = function()
-	awful.spawn.easy_async_with_shell("Vvolume %", function(stdout)
-		local curr_volume = string.match(stdout, "Volume: (%d+)")
-		local muted = string.match(stdout, "Mute: (%S+)")
-		
-		-- set foreground color
-		if muted == "no" then
-			volume.bar.bar.color = beautiful.volume_bar_unmute
-		else
-			volume.bar.bar.color = beautiful.volume_bar_mute
-		end
-		
-		volume.bar.bar:set_value(tonumber(curr_volume))
-	end)
-end
-
-volume.bar:buttons(awful.util.table.join(
-    awful.button({}, 2, function() -- middle click
-		awful.spawn.easy_async_with_shell("Vvolume 50",function()end)
-        volume.update()
-    end),
-    awful.button({}, 3, function() -- right click
-		os.execute("Vvolume 0")
-        volume.update()
-    end),
-    awful.button({}, 5, function() -- scroll up
-		awful.spawn.easy_async_with_shell("Vvolume +",function()end)
-		volume.update()
-    end),
-    awful.button({}, 4, function() -- scroll down
-		awful.spawn.easy_async_with_shell("Vvolume -",function()end)
-		volume.update()
-    end)
-))
-
-brightness.update()
-volume.update()
+-- custom widgets
+battery.init(beautiful)
+volume.init(beautiful)
+brightness.init(beautiful)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -358,9 +189,9 @@ awful.screen.connect_for_each_screen(function(s)
             mylauncher,
             s.mytaglist,
 			wibox.widget.textbox("|"),
-			volume.bar,
+			volume.widget,
 			wibox.widget.textbox("|"),
-			brightness.bar,
+			brightness.widget,
 			wibox.widget.textbox("|"),
             s.mypromptbox,
         },
@@ -369,7 +200,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             mytextclock,
-			battery,
+			battery.widget,
             s.mylayoutbox,
         },
     }
@@ -468,35 +299,6 @@ globalkeys = gears.table.join(
     awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}
 	),
-	awful.key({}, "XF86MonBrightnessDown", function()
-		awful.spawn.easy_async_with_shell("Vbrightness -",function()end)
-		brightness.update()
-		end,
-		{description = "lower brightness", group = "system"}
-	),
-	awful.key({}, "XF86MonBrightnessUp", function()
-		awful.spawn.easy_async_with_shell("Vbrightness +",function()end)
-		brightness.update()
-		end,
-		{description = "raise brightness", group = "system"}
-	),
-	awful.key({}, "XF86AudioMute", function()
-			os.execute("Vvolume 0")
-			volume.update()
-		end,
-		{description = "mute", group = "system"}
-	),
-	awful.key({}, "XF86AudioLowerVolume", function()
-			awful.spawn.easy_async_with_shell("Vvolume -",function()end)
-			volume.update() end,
-		{description = "lower volume", group = "system"}
-	),
-	awful.key({}, "XF86AudioRaiseVolume", function()
-			awful.spawn.easy_async_with_shell("Vvolume +",function()end)
-			volume.update()
-			end,
-		{description = "raise volume", group = "system"}
-	),
 	awful.key({}, "XF86AudioMicMute", function()awful.util.spawn_with_shell("Vbluetoothtoggle")end,
 		{description = "toggle bluetooth", group = "system"}
 	),
@@ -521,6 +323,8 @@ globalkeys = gears.table.join(
           {description = "toggle statusbar", group = "awesome"}
 	)
 )
+
+globalkeys = gears.table.join(globalkeys, volume.keys, brightness.keys)
 
 clientkeys = gears.table.join(
     awful.key({ modkey,           }, "f",

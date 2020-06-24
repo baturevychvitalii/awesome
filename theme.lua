@@ -31,6 +31,7 @@ theme.border_focus  = "#e53c18"
 theme.border_marked = "#91231c"
 
 --theme.volume_bar_unmute = "#a4ce8a"
+theme.bars_width = 77
 theme.volume_bar_unmute = theme.bg_focus
 theme.volume_bar_mute = "#eb8f8f"
 theme.brightness_bar = theme.bg_focus
