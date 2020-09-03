@@ -16,12 +16,8 @@ local layouts = {
 	{"cz(qwerty)", "cz.xpm"}
 }
 
-local connections = {}
-
-
-
 local function shift_layout(client, shift)
-	connections[client.window] = ((connections[client.window] + shift - 1) % #layouts) + 1	
+	client.keyboard_layout = ((client.keyboard_layout + shift - 1) % #layouts) + 1	
 end
 
 
@@ -32,7 +28,7 @@ keyboard.init = function(theme)
 	keyboard.widget:set_image(beautiful.awesome_icon)
 
 	keyboard.update = function (client)
-		layout = connections[client.window]
+		layout = client.keyboard_layout
 		-- change layout
 		awful.spawn.easy_async_with_shell("xkb-switch -s \"" .. layouts[layout][1] .. "\"" ,function()end)
 		-- set image for widget
@@ -74,16 +70,10 @@ keyboard.init = function(theme)
 	)
 end
 
-client.connect_signal("unmanage", function(c)
-	connections[c.window] = nil
-end)
-
 client.connect_signal("focus", function(c)
-	if connections[c.window] == nil then
-		
-		connections[c.window] = 1
+	if c.keyboard_layout ~= nil then
+		keyboard.update(c)
 	end
-	keyboard.update(c)
 end)
 
 return keyboard

@@ -466,6 +466,7 @@ awful.rules.rules = {
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen,
 					 size_hints_honor = false,
 					 titlebars_enabled = false,
+					 keyboard_layout = 1
      }
     },
 
@@ -544,6 +545,14 @@ awful.rules.rules = {
 			end
 		end
 	},
+	{
+		rule_any = {
+			name = {
+				"Telegram"
+			}
+		},
+		properties = { keyboard_layout = 3 } -- default to ukrainian layout
+	}
 }
 -- }}}
 
