@@ -6,7 +6,7 @@ function run()
 }
 
 
-sleep 1 && run xxkb
+#sleep 1 && run xxkb
 run keepassxc
 run xterm
 run firefox

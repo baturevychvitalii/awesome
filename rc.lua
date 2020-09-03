@@ -18,6 +18,7 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 local battery = require("./battery")
 local volume = require("./volume")
 local brightness = require("./brightness")
+local keyboard = require("./keyboard")
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -87,6 +88,7 @@ mytextclock = wibox.widget.textclock()
 battery.init(beautiful)
 volume.init(beautiful)
 brightness.init(beautiful)
+keyboard.init(beautiful)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -199,6 +201,7 @@ awful.screen.connect_for_each_screen(function(s)
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
+			keyboard.widget,
             wibox.widget.systray(),
             mytextclock,
 			battery.widget,
@@ -329,7 +332,7 @@ globalkeys = gears.table.join(
 
 )
 
-globalkeys = gears.table.join(globalkeys, volume.keys, brightness.keys)
+globalkeys = gears.table.join(globalkeys, volume.keys, brightness.keys, keyboard.keys)
 
 clientkeys = gears.table.join(
     awful.key({ modkey,           }, "f",
@@ -462,7 +465,7 @@ awful.rules.rules = {
                      screen = awful.screen.preferred,
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen,
 					 size_hints_honor = false,
-					 titlebars_enabled = false
+					 titlebars_enabled = false,
      }
     },
 
@@ -472,7 +475,6 @@ awful.rules.rules = {
 			class = {
 				"Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
 				"Ida",
-				"vlc",
 				"KeePassXC",
 				"Arandr"
 			},
@@ -481,6 +483,7 @@ awful.rules.rules = {
 			-- and the name shown there might not match defined rules here.
 			name = {
 				"Event Tester",  -- xev.
+				".* VLC media player$"
 			},
 			type = {
 				"dialog"
