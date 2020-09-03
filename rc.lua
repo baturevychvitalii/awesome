@@ -14,11 +14,13 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
+local gfs = require("gears.filesystem")
 
 local battery = require("./battery")
 local volume = require("./volume")
 local brightness = require("./brightness")
 local keyboard = require("./keyboard")
+local myutils = require("./myutils")
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -74,7 +76,7 @@ awful.layout.layouts = {
 -- }}}
 
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init("~/.config/awesome/theme.lua")
+beautiful.init(gfs.get_configuration_dir() .. "theme.lua")
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
@@ -449,8 +451,6 @@ clientbuttons = gears.table.join(
 root.keys(globalkeys)
 -- }}}
 
-local telegram_close_counter = 0
-
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
@@ -501,7 +501,7 @@ awful.rules.rules = {
 				"Spotify"
 			},
 		},
-		properties = { tag = "2" } 
+		properties = { tag = "2", screen = myutils.preferred_screen(2) } 
 	},
 
 	{
@@ -522,36 +522,44 @@ awful.rules.rules = {
 				"battle.net.exe"
 			},
 		},
-		properties = { tag = "3", floating = true }
+		properties = { tag = "3", floating = true , screen = myutils.preferred_screen(2) }
 	},
 
 	{
 		rule = {class =	"XTerm"},
-		properties = { screen = 1, tag = "1" }
+		properties = { tag = "1" }
 	},
 
 	{
 		rule = {name = ".* - Oracle VM VirtualBox"},
-		properties = { tag = "4", fullscreen = true }
+		properties = { tag = "4", fullscreen = true, screen = myutils.preferred_screen(2) }
 	},
 
-	-- close telegram after boot cause it's annoying to see
 	{
 		rule = {name = "Telegram"},
-		callback = function(c)
-			if telegram_close_counter == 0 then
-				telegram_close_counter = 1
-				c:kill()
-			end
-		end
+		properties = { tag = "2", minimized = true, screen = myutils.preferred_screen(1) }
 	},
+
+	-- default keyboard layouts
 	{
-		rule_any = {
+		rule_any = { -- default to ukrainian layout
 			name = {
 				"Telegram"
+			},
+			class = {
 			}
 		},
-		properties = { keyboard_layout = 3 } -- default to ukrainian layout
+		properties = { keyboard_layout = 3 }
+	},
+	{
+		rule_any = { -- default to russian layout
+			name = {
+			},
+			class = {
+				"Skype"
+			}
+		},
+		properties = { keyboard_layout = 2 }
 	}
 }
 -- }}}
@@ -647,5 +655,5 @@ screen.connect_signal("arrange", function (s)
 end)
 -- }}}
 
-awful.util.spawn_with_shell("~/.config/awesome/autorun.sh")
+awful.util.spawn_with_shell(gfs.get_configuration_dir() .. "autorun.sh")
 

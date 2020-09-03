@@ -12,4 +12,5 @@ run xterm
 run firefox
 run telegram-desktop
 run redshift
+run /usr/lib/xscreensaver/glmatrix -root -no-rotate
 
