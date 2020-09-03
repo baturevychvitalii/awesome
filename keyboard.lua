@@ -20,6 +20,12 @@ local function shift_layout(client, shift)
 	client.keyboard_layout = ((client.keyboard_layout + shift - 1) % #layouts) + 1	
 end
 
+local function alter_current_client(shift)
+	if (client.focus ~= nil) then
+		shift_layout(client.focus, shift)
+		keyboard.update(client.focus)
+	end
+end
 
 keyboard.init = function(theme)
 	beautiful = theme
@@ -36,35 +42,19 @@ keyboard.init = function(theme)
 	end
 
 	keyboard.widget:buttons(gears.table.join(
-		awful.button({}, 2, function() -- middle click
-			connections[client.focus.window] = 1
-			keyboard.update(client.focus)
-		end),
 		awful.button({}, 5, function() -- scroll up
-			c = client.focus
-			shift_layout(c, 1)
-			keyboard.update(c)
+			alter_current_client(1)
 		end),
 		awful.button({}, 4, function() -- scroll down
-			c = client.focus
-			shift_layout(c, -1)
-			keyboard.update(c)
+			alter_current_client(-1)
 		end)
 	))
 
 	keyboard.keys = gears.table.join(
-		awful.key({ modkey }, "q" , function()
-			c = client.focus
-			shift_layout(c, -1)
-			keyboard.update(c)
-			end,
+		awful.key({ modkey }, "q" , function() alter_current_client(-1) end,
 			{description = "previous keyboard layout", group = "system"}
 		),
-		awful.key({ modkey }, "w" , function()
-			c = client.focus
-			shift_layout(c, 1)
-			keyboard.update(c)
-			end,
+		awful.key({ modkey }, "w" , function() alter_current_client(1) end,
 			{description = "next keyboard layout", group = "system"}
 		)
 	)
@@ -77,9 +67,7 @@ client.connect_signal("focus", function(c)
 end)
 
 client.connect_signal("unfocus", function(c)
-	if c.keyboard_layout ~= nil then
-		keyboard.widget:set_image(beautiful.keyboard_icons .. "none_color.png")
-	end
+	keyboard.widget:set_image(beautiful.keyboard_icons .. "none_color.png")
 end)
 
 return keyboard
