@@ -76,4 +76,10 @@ client.connect_signal("focus", function(c)
 	end
 end)
 
+client.connect_signal("unfocus", function(c)
+	if c.keyboard_layout ~= nil then
+		keyboard.widget:set_image(beautiful.keyboard_icons .. "none_color.png")
+	end
+end)
+
 return keyboard
