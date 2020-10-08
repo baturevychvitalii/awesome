@@ -53,17 +53,34 @@ battery.init = function(theme)
 			battery_status.status = file:read()
 			file:close()
 			battery.widget.bar:set_value(battery_status.percentage)
-			if battery_status.percentage <= 10 and battery_status.status == "Discharging" and (not low_battery_showed) then
-				naughty.notify({
-					text = "Веталя, заряди меня пожалуйста",
-					title = "Села батарейка",
-					timeout = 0,
-					bg = beautiful.bg_urgent,
-					fg = beautiful.fg_urgent
-				})
-				battery.widget.bar.color = beautiful.battery_bar_low
-				low_battery_showed = true
-			elseif low_battery_showed and battery_status.status == "Charging" then
+			if battery_status.status == "Discharging" then
+
+				-- show notification telling to plug device into charger
+				if battery_status.percentage <= 10 and (not low_battery_showed) then
+					naughty.notify({
+						text = "Веталя, заряди меня пожалуйста",
+						title = "Села батарейка",
+						timeout = 0,
+						bg = beautiful.bg_urgent,
+						fg = beautiful.fg_urgent
+					})
+					battery.widget.bar.color = beautiful.battery_bar_low
+					low_battery_showed = true
+				end
+				
+				-- hibernate the system if power falls below 3%
+				if battery_status.percentage <= 3 then
+					naughty.notify({
+						text = "Пришлось загибернироватся",
+						title = "Я же просил, зарядить меня...",
+						timeout = 5,
+						bg = beautiful.bg_urgent,
+						fg = beautiful.fg_urgent
+					})
+					awful.util.spawn_with_shell("sleep 5s && systemctl hibernate")
+				end
+
+			elseif battery_status.status == "Charging" and low_battery_showed then
 				battery.widget.bar.color = beautiful.battery_bar_charged
 				low_battery_showed = false
 			end

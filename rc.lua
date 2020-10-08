@@ -153,14 +153,18 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4" }, s, {awful.layout.suit.tile,
+    awful.tag({ "main", "2Bc.", "3vzd", "4pst", "5syp", "6ppa", "7git"}, s, {awful.layout.suit.max,
 											awful.layout.suit.max,
-											awful.layout.suit.floating,
-											awful.layout.suit.floating
+											awful.layout.suit.max,
+											awful.layout.suit.max,
+											awful.layout.suit.max,
+											awful.layout.suit.max,
+											awful.layout.suit.tile
 										 })
 
     -- Create a promptbox for each screen
-    s.mypromptbox = awful.widget.prompt()
+	s.mypromptbox = awful.widget.prompt()
+
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
@@ -302,7 +306,11 @@ globalkeys = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
+    awful.key({ modkey },            "r",
+		function ()
+			os.execute("xkb-switch -s \"us(euro)\"")
+			awful.screen.focused().mypromptbox:run()
+		end,
               {description = "run prompt", group = "launcher"}
 	),
 	awful.key({}, "XF86AudioMicMute", function()awful.util.spawn_with_shell("Vbluetoothtoggle")end,
@@ -312,13 +320,13 @@ globalkeys = gears.table.join(
 		{description = "lock session", group = "system"}
 	),
 
-	awful.key({}, "Print", function() awful.util.spawn_with_shell("Vscreenshot full")end,
+	awful.key({ modkey, "Shift" }, "Print", function() awful.util.spawn_with_shell("Vscreenshot full")end,
 		{description = "screen capture whole screen", group = "screenshot"}
 	),
 	awful.key({ modkey }, "Print", function() awful.util.spawn_with_shell("Vscreenshot focused")end,
 		{description = "screen capture focused window", group = "screenshot"}
 	),
-	awful.key({ modkey, "Shift" }, "Print", function() awful.util.spawn_with_shell("sleep 0.2 && Vscreenshot select")end,
+	awful.key({}, "Print", function() awful.util.spawn_with_shell("sleep 0.2 && Vscreenshot select")end,
 		{description = "screen capture selected area", group = "screenshot"}
 	),
 	awful.key({ modkey }, "b",
@@ -519,7 +527,8 @@ awful.rules.rules = {
 			class = { 
 				"steam_app.*",
 				"Steam",
-				"battle.net.exe"
+				"battle.net.exe",
+				"dota2"
 			},
 		},
 		properties = { tag = "3", floating = true , screen = myutils.preferred_screen(2) }
@@ -624,16 +633,24 @@ end)
 
 client.connect_signal("focus", function(c)
 	c.border_color = beautiful.border_focus 
+	if c.class == "dota2" then
+		os.execute("xinput --set-prop \"Razer Razer Abyssus 2000\" \"libinput Accel Speed\" -0.7")
+	end
 end)
 
 client.connect_signal("unfocus", function(c)
 	c.border_color = beautiful.border_normal
+	if c.class == "dota2" then
+		os.execute("xinput --set-prop \"Razer Razer Abyssus 2000\" \"libinput Accel Speed\" -0.5")
+	end
 end)
 
-client.connect_signal("property::minimized", function(c) if
-	c.class == "dota2" or
-	c.class == "csgo_linux64"
-then c.minimized = false end end)
+client.connect_signal("property::minimized", function(c)
+	if c.class == "dota2" or
+		c.class == "csgo_linux64" then
+		c.minimized = false
+	end
+end)
 
 function tablelength(T)
   local count = 0
