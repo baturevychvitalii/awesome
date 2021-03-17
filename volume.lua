@@ -50,7 +50,7 @@ volume.init = function(theme)
 
 	volume.widget:buttons(gears.table.join(
 		awful.button({}, 2, function() -- middle click
-			awful.spawn.easy_async_with_shell("Vvolume 50",function()end)
+			awful.spawn.easy_async_with_shell("Vvolume 100",function()end)
 			volume.update()
 		end),
 		awful.button({}, 3, function() -- right click

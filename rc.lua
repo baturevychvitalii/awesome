@@ -147,19 +147,22 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
-awful.screen.set_auto_dpi_enabled(true)
+awful.screen.set_auto_dpi_enabled(false)
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "main", "2Bc.", "3vzd", "4pst", "5syp", "6ppa", "7git"}, s, {awful.layout.suit.max,
+    awful.tag({ "main", "2 ag2", "3 bez", "4 eha", "5 emp", "6 pjp", "7 si1", "8 hte", "9 soul" }, s, {
 											awful.layout.suit.max,
 											awful.layout.suit.max,
 											awful.layout.suit.max,
 											awful.layout.suit.max,
 											awful.layout.suit.max,
-											awful.layout.suit.tile
+											awful.layout.suit.max,
+											awful.layout.suit.max,
+											awful.layout.suit.max,
+											awful.layout.suit.floating
 										 })
 
     -- Create a promptbox for each screen
@@ -452,6 +455,9 @@ clientbuttons = gears.table.join(
     awful.button({ modkey }, 3, function (c)
         c:emit_signal("request::activate", "mouse_click", {raise = true})
         awful.mouse.client.resize(c)
+    end),
+    awful.button({ modkey }, 2, function (c)
+		c.floating = not c.floating
     end)
 )
 
@@ -540,33 +546,35 @@ awful.rules.rules = {
 	},
 
 	{
+		rule_any = {
+			name = {".* - EA Academic", "Enterprise Architect"},
+			class = {"ea.exe"}
+		},
+		properties = { tag = "7 si1", fullscreen = false }
+	},
+
+	{
 		rule = {name = ".* - Oracle VM VirtualBox"},
 		properties = { tag = "4", fullscreen = true, screen = myutils.preferred_screen(2) }
 	},
 
 	{
 		rule = {name = "Telegram"},
-		properties = { tag = "2", minimized = true, screen = myutils.preferred_screen(1) }
+		properties = { tag = "main", minimized = true, screen = myutils.preferred_screen(1) }
 	},
 
 	-- default keyboard layouts
 	{
 		rule_any = { -- default to ukrainian layout
-			name = {
-				"Telegram"
-			},
-			class = {
-			}
+			name = { "Telegram"},
+			class = {  }
 		},
 		properties = { keyboard_layout = 3 }
 	},
 	{
 		rule_any = { -- default to russian layout
-			name = {
-			},
-			class = {
-				"Skype"
-			}
+			name = {  },
+			class = { "Skype" }
 		},
 		properties = { keyboard_layout = 2 }
 	}
@@ -647,7 +655,8 @@ end)
 
 client.connect_signal("property::minimized", function(c)
 	if c.class == "dota2" or
-		c.class == "csgo_linux64" then
+		c.class == "csgo_linux64" or
+		string.find(c.class, "Minecraft") then
 		c.minimized = false
 	end
 end)
