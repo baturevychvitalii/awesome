@@ -33,7 +33,7 @@ run keepassxc
 run xterm
 run firefox
 run telegram-desktop
-run teams
+#run teams
 kill_it redshift && sleep 3s && run redshift -l 50.08804:14.42076
 #run /usr/lib/xscreensaver/glmatrix -root -no-rotate
 

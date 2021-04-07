@@ -147,7 +147,7 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
-awful.screen.set_auto_dpi_enabled(false)
+awful.screen.set_auto_dpi_enabled(true)
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
@@ -322,7 +322,18 @@ globalkeys = gears.table.join(
 	awful.key({}, "XF86WebCam", function() awful.util.spawn_with_shell("xset s activate")end,
 		{description = "lock session", group = "system"}
 	),
-
+	awful.key({}, "XF86AudioPlay", function() awful.util.spawn_with_shell("playerctl play-pause")end,
+		{description = "play/pause", group = "media"}
+	),
+	awful.key({}, "XF86AudioStop", function() awful.util.spawn_with_shell("playerctl stop")end,
+		{description = "stop", group = "media"}
+	),
+	awful.key({}, "XF86AudioNext", function() awful.util.spawn_with_shell("playerctl next")end,
+		{description = "next", group = "media"}
+	),
+	awful.key({}, "XF86AudioPrev", function() awful.util.spawn_with_shell("playerctl previous")end,
+		{description = "previous", group = "media"}
+	),
 	awful.key({ modkey, "Shift" }, "Print", function() awful.util.spawn_with_shell("Vscreenshot full")end,
 		{description = "screen capture whole screen", group = "screenshot"}
 	),
