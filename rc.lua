@@ -70,6 +70,7 @@ modkey = "Mod4"
 awful.layout.layouts = {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
+    awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.max,
 }
@@ -153,16 +154,11 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "main", "2 ag2", "3 bez", "4 eha", "5 emp", "6 pjp", "7 si1", "8 hte", "9 soul" }, s, {
+    awful.tag({ "main", "chill", "work" }, s, {
+											awful.layout.suit.tile,
 											awful.layout.suit.max,
+											--awful.layout.suit.floating,
 											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.max,
-											awful.layout.suit.floating
 										 })
 
     -- Create a promptbox for each screen
@@ -526,7 +522,7 @@ awful.rules.rules = {
 				"Spotify"
 			},
 		},
-		properties = { tag = "2", screen = myutils.preferred_screen(2) } 
+		properties = { screen = myutils.preferred_screen(2) } 
 	},
 
 	{
