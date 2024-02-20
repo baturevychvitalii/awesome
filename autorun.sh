@@ -32,7 +32,7 @@ function kill_it()
 run xterm
 run pcloud
 run firefox
-run telegram-desktop
+#run telegram-desktop
 run teams
 
 kill_it redshift && sleep 3s && run redshift -l 50.08804:14.42076

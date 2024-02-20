@@ -525,6 +525,15 @@ awful.rules.rules = {
 		properties = { screen = myutils.preferred_screen(2) } 
 	},
 
+    {
+		rule_any = { 
+			class = {
+				"firefox"
+			},
+		},
+		properties = { screen = myutils.preferred_screen(2), tag = "chill" } 
+	},
+
 	{
 		rule_any = {
 			class = {
@@ -544,7 +553,7 @@ awful.rules.rules = {
 				"dota2"
 			},
 		},
-		properties = { tag = "3", floating = true , screen = myutils.preferred_screen(2) }
+		properties = { tag = "chill", floating = true , screen = myutils.preferred_screen(1) }
 	},
 
 	{
