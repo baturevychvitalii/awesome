@@ -474,6 +474,8 @@ root.keys(globalkeys)
 
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
+local floating_client_properties = { floating = true, titlebars_enabled = true }
+
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
@@ -511,7 +513,13 @@ awful.rules.rules = {
 				"dialog"
 			},
 		}, 
-		properties = { floating = true, titlebars_enabled = true }
+		properties = floating_client_properties
+	},
+
+	-- open telegram media without disturbing the layout
+	{
+		rule = { class = "TelegramDesktop", name = "Media viewer" },
+		properties = floating_client_properties
 	},
 
     {
