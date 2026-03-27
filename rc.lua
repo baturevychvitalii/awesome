@@ -154,11 +154,12 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "main", "chill", "work" }, s, {
+    awful.tag({ "sys", "chill", "spanish", "code" }, s, {
 											awful.layout.suit.tile,
 											awful.layout.suit.max,
 											--awful.layout.suit.floating,
 											awful.layout.suit.max,
+											awful.layout.suit.tile,
 										 })
 
     -- Create a promptbox for each screen
@@ -225,7 +226,7 @@ root.buttons(gears.table.join(
 
 -- {{{ Key bindings
 globalkeys = gears.table.join(
-    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
+    awful.key({ modkey,  "Shift"  }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
               {description = "view previous", group = "tag"}),
@@ -317,6 +318,9 @@ globalkeys = gears.table.join(
 	),
 	awful.key({}, "XF86WebCam", function() awful.util.spawn_with_shell("xset s activate")end,
 		{description = "lock session", group = "system"}
+	),
+	awful.key({ modkey }, "s", function() awful.spawn("systemctl suspend")end,
+		{description = "hora de dormir", group = "system"}
 	),
 	awful.key({}, "XF86AudioPlay", function() awful.util.spawn_with_shell("playerctl play-pause")end,
 		{description = "play/pause", group = "media"}
