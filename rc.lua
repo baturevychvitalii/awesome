@@ -349,6 +349,9 @@ globalkeys = gears.table.join(
               myscreen.mywibox.visible = not myscreen.mywibox.visible
           end,
           {description = "toggle statusbar", group = "awesome"}
+	),
+	awful.key({ modkey }, "v", function() awful.spawn("Vvoicetoggle") end,
+		{description = "toggle voice dictation", group = "launcher"}
 	)
 	--awful.key({ modkey }, "d", function()  end,
 	--		{description = "switch ", group = "screen"}

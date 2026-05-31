@@ -28,6 +28,10 @@ function kill_it()
 }
 
 
+# Signal to systemd that the graphical session is ready.
+# This activates graphical-session.target, which starts all dependent services.
+systemctl --user start graphical-session-init.service
+
 #sleep 1 && run xxkb
 run xterm
 run pcloud
